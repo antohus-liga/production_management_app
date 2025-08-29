@@ -3,7 +3,8 @@ import os
 import sys
 
 from PySide6.QtWidgets import QApplication, QWidget
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Column, Integer
+from sqlalchemy.orm import sessionmaker, declarative_base
 
 app = QApplication(sys.argv)
 
