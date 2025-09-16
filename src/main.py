@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 
-from PySide6.QtWidgets import QApplication, QWidget
+from PySide6.QtWidgets import QApplication
 from sqlalchemy import create_engine
 
 app = QApplication(sys.argv)
@@ -22,8 +22,5 @@ logging.basicConfig(
 )
 logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 engine = create_engine(f"sqlite:///{db_path}")
-
-widget = QWidget()
-widget.show()
 
 app.exec()
