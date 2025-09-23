@@ -13,3 +13,5 @@ class ClientObj(Base):
     country = Column(String)
     phone_number = Column(String)
     email = Column(String)
+
+    movements_out = relationship("MovementOutObj", back_populates="clients")

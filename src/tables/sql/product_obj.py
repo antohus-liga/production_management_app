@@ -10,3 +10,6 @@ class ProductObj(Base):
     prod_id = Column(String, primary_key=True)
     description = Column(String)
     quantity = Column(Integer)
+    selling_price = Column(Float)
+
+    movements_out = relationship("MovementOutObj", back_populates="products")
