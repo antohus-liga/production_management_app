@@ -7,7 +7,7 @@ from tables.sql.base import Base
 class ProductObj(Base):
     __tablename__ = "products"
 
-    prod_id = Column(String, primary_key=True)
+    id = Column(String, primary_key=True)
     description = Column(String)
     quantity = Column(Integer)
     selling_price = Column(Float)

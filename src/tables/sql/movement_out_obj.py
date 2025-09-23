@@ -8,10 +8,10 @@ class MovementOutObj(Base):
     __tablename__ = "materials"
 
     movement_nr = Column(Integer, primary_key=True)
-    product_id = Column(String)
+    product_id = Column(String, ForeignKey("products.id"))
     quantity = Column(Integer)
     total_price = Column(Float)
-    cod_sup = Column(String, ForeignKey("suppliers.cod_sup"))
+    cod_cli = Column(String, ForeignKey("suppliers.cod_cli"))
 
     products = relationship("ProductObj", back_populates="movements_out")
     clients = relationship("ClientObj", back_populates="movements_out")

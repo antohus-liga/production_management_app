@@ -8,7 +8,7 @@ class MovementInObj(Base):
     __tablename__ = "materials"
 
     movement_nr = Column(Integer, primary_key=True)
-    material_id = Column(String)
+    material_id = Column(String, ForeignKey("materials.id"))
     quantity = Column(Integer)
     total_price = Column(Float)
     cod_sup = Column(String, ForeignKey("suppliers.cod_sup"))

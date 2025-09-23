@@ -7,7 +7,7 @@ from tables.sql.base import Base
 class MaterialObj(Base):
     __tablename__ = "materials"
 
-    material_id = Column(String, primary_key=True)
+    id = Column(String, primary_key=True)
     description = Column(String)
     quantity = Column(Integer)
     unit_price = Column(Float)
