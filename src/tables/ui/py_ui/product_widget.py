@@ -1,5 +1,3 @@
-import sys
-
 from PySide6.QtWidgets import QWidget
 
 from tables.ui.uic.ui_product_widget import Ui_ProductTable
