@@ -2,12 +2,10 @@ import logging
 import os
 import sys
 
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QWidget
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
-from tables.sql.base import Base
-from tables.ui.py_ui.product_widget import ProductWidget
+import tables.sql.client_obj
 
 app = QApplication(sys.argv)
 
@@ -27,12 +25,7 @@ logging.basicConfig(
 logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 engine = create_engine(f"sqlite:///{db_path}")
 
-Session = sessionmaker(bind=engine)
-session = Session()
-
-Base.metadata.create_all(engine)
-
-widget = ProductWidget()
+widget = QWidget()
 widget.show()
 
 app.exec()
