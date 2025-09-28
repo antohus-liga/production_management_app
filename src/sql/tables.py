@@ -32,7 +32,7 @@ class ClientObj(Base):
             f"name={self.name}, "
             f"city={self.city}, "
             f"country={self.country}, "
-            f"phone_number={self.phone_number}, "
+            f"phone={self.phone}, "
             f"email={self.email})"
         )
 
@@ -45,6 +45,14 @@ class MaterialObj(Base):
     quantity = Column(Integer)
     unit_price = Column(Float)
 
+    def __repr__(self):
+        return (
+            f"(id={self.id}, "
+            f"description={self.description}, "
+            f"quantity={self.quantity}, "
+            f"unit_price={self.unit_price})"
+        )
+
 
 class MovementInObj(Base):
     __tablename__ = "movements_in"
@@ -54,6 +62,15 @@ class MovementInObj(Base):
     quantity = Column(Integer)
     total_price = Column(Float)
     cod_sup = Column(String, ForeignKey("suppliers.cod_sup"))
+
+    def __repr__(self):
+        return (
+            f"(movement_nr={self.movement_nr}, "
+            f"material_id={self.material_id}, "
+            f"quantity={self.quantity}, "
+            f"total_price={self.total_price}, "
+            f"cod_sup={self.cod_sup})"
+        )
 
 
 class MovementOutObj(Base):
@@ -65,6 +82,15 @@ class MovementOutObj(Base):
     total_price = Column(Float)
     cod_cli = Column(String, ForeignKey("clients.cod_cli"))
 
+    def __repr__(self):
+        return (
+            f"(movement_nr={self.movement_nr}, "
+            f"product_id={self.product_id}, "
+            f"quantity={self.quantity}, "
+            f"total_price={self.total_price}, "
+            f"cod_cli={self.cod_cli})"
+        )
+
 
 class ProductObj(Base):
     __tablename__ = "products"
@@ -73,6 +99,14 @@ class ProductObj(Base):
     description = Column(String)
     quantity = Column(Integer)
     selling_price = Column(Float)
+
+    def __repr__(self):
+        return (
+            f"(id={self.id}, "
+            f"description={self.material_id}, "
+            f"quantity={self.quantity}, "
+            f"selling_price={self.cod_sup})"
+        )
 
 
 class SupplierObj(Base):
@@ -84,6 +118,16 @@ class SupplierObj(Base):
     country = Column(String)
     phone_number = Column(String)
     email = Column(String)
+
+    def __repr__(self):
+        return (
+            f"(cod_sup={self.cod_sup}, "
+            f"name={self.name}, "
+            f"city={self.city}, "
+            f"country={self.country}, "
+            f"phone={self.phone}, "
+            f"email={self.email})"
+        )
 
 
 Base.metadata.create_all(bind=engine)
