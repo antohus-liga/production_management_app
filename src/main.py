@@ -2,19 +2,18 @@ import logging
 import os
 import sys
 
-from PySide6.QtWidgets import QApplication, QWidget
-from sqlalchemy import create_engine
+from PySide6.QtWidgets import QApplication, QHBoxLayout, QPushButton, QWidget
 
-import tables.sql.client_obj
+from sql.db_manager import insert
+from sql.tables import ClientObj
 
 app = QApplication(sys.argv)
 
 data_path = os.path.join(
     os.path.dirname(__file__),
     "..",
-    "data",
+    "appdata",
 )
-db_path = os.path.join(data_path, "stock_info.db")
 logs_path = os.path.join(data_path, "db_logs.log")
 
 logging.basicConfig(
@@ -23,9 +22,27 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
-engine = create_engine(f"sqlite:///{db_path}")
 
 widget = QWidget()
+
+btn = QPushButton("insert")
+btn.clicked.connect(
+    lambda: insert(
+        ClientObj(
+            cod_cli="abc",
+            name="david",
+            city="pvz",
+            country="pt",
+            phone_number="923984982",
+            email="davidnovo1408@gmail.com",
+        )
+    )
+)
+
+layout = QHBoxLayout()
+layout.addWidget(btn)
+widget.setLayout(layout)
+
 widget.show()
 
 app.exec()

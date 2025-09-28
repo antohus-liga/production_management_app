@@ -8,10 +8,9 @@ data_path = os.path.join(
     os.path.dirname(__file__),
     "..",
     "..",
-    "..",
-    "data",
+    "appdata",
 )
-db_path = os.path.join(data_path, "stock_info.db")
+db_path = os.path.join(data_path, "prod_info.db")
 
 engine = create_engine(f"sqlite:///{db_path}")
 Base = declarative_base()
@@ -26,6 +25,16 @@ class ClientObj(Base):
     country = Column(String)
     phone_number = Column(String)
     email = Column(String)
+
+    def __repr__(self):
+        return (
+            f"(cod_cli={self.cod_cli}, "
+            f"name={self.name}, "
+            f"city={self.city}, "
+            f"country={self.country}, "
+            f"phone_number={self.phone_number}, "
+            f"email={self.email})"
+        )
 
 
 class MaterialObj(Base):
