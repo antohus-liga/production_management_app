@@ -23,7 +23,7 @@ class ClientObj(Base):
     name = Column(String)
     city = Column(String)
     country = Column(String)
-    phone_number = Column(String)
+    phone = Column(String)
     email = Column(String)
 
     def __repr__(self):
@@ -116,7 +116,7 @@ class SupplierObj(Base):
     name = Column(String)
     city = Column(String)
     country = Column(String)
-    phone_number = Column(String)
+    phone = Column(String)
     email = Column(String)
 
     def __repr__(self):
