@@ -1,7 +1,6 @@
 from PySide6.QtWidgets import (QHeaderView, QPushButton, QSizePolicy,
                                QTableView, QVBoxLayout, QWidget)
 
-from sql.db_manager import load_table
 from ui.tables.clients_model import ClientsTableModel
 
 
@@ -10,25 +9,27 @@ class ClientsWidget(QWidget):
         super().__init__()
         self.stack = stack
 
-        self.model = ClientsTableModel(load_table("clients"))
+        self.model = ClientsTableModel(self)
 
         self.table_view = QTableView()
         self.table_view.setModel(self.model)
 
-        self.horizontal_header = self.table_view.horizontalHeader()
-        self.vertical_header = self.table_view.verticalHeader()
-        self.horizontal_header.setSectionResizeMode(
-            QHeaderView.ResizeToContents)
-        self.vertical_header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.table_view.horizontalHeader().setSectionResizeMode(
+            QHeaderView.ResizeToContents
+        )
+        self.table_view.verticalHeader().setSectionResizeMode(
+            QHeaderView.ResizeToContents
+        )
 
         go_back_btn = QPushButton("Go back")
         go_back_btn.clicked.connect(lambda: self.stack.setCurrentIndex(0))
 
         layout = QVBoxLayout()
-        size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 
+        size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         size.setHorizontalStretch(1)
         self.table_view.setSizePolicy(size)
+
         layout.addWidget(self.table_view)
         layout.addWidget(go_back_btn)
 
