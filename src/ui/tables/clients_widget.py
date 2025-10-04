@@ -1,19 +1,31 @@
+from PySide6.QtGui import QFont, QIcon
 from PySide6.QtWidgets import (QHBoxLayout, QHeaderView, QPushButton,
                                QSizePolicy, QTableView, QVBoxLayout, QWidget)
 
-from ui.tables.sql_table_model import TableModel
-from ui.tables.unsubmitted_highlight import HighlightDelegate
+import ui.resources.resources_rc
+from ui.tables.components.push_button import PushButton
+from ui.tables.components.sql_table_model import TableModel
+from ui.tables.components.unsubmitted_highlight import HighlightDelegate
 
 
 class ClientsWidget(QWidget):
     def __init__(self, stack):
         super().__init__()
         self.stack = stack
+        self.font = QFont()
+        self.font.setPointSize(16)
 
         self.model = TableModel(self, "clients")
 
         self.table_view = QTableView()
         self.table_view.setModel(self.model)
+        self.table_view.setFont(self.font)
+        self.table_view.setEditTriggers(
+            QTableView.DoubleClicked | QTableView.SelectedClicked
+        )
+        self.table_view.setStyleSheet(
+            "QLineEdit { background: palette(base); color: palette(text); }"
+        )
 
         self.delegate = HighlightDelegate(self.table_view)
         self.table_view.setItemDelegate(self.delegate)
@@ -26,7 +38,8 @@ class ClientsWidget(QWidget):
         )
         self.table_view.setSelectionBehavior(QTableView.SelectRows)
 
-        go_back_btn = QPushButton("Go back")
+        go_back_btn = PushButton("Go back")
+        go_back_btn.setIcon(QIcon(":/icons/back-arrow.png"))
         go_back_btn.clicked.connect(lambda: self.stack.setCurrentIndex(0))
 
         size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
@@ -34,10 +47,14 @@ class ClientsWidget(QWidget):
         self.table_view.setSizePolicy(size)
         self.table_view.verticalHeader().setVisible(False)
 
-        confirm_btn = QPushButton("confirm changes")
-        add_btn = QPushButton("insert")
-        delete_btn = QPushButton("delete")
-        discard_btn = QPushButton("discard changes")
+        confirm_btn = PushButton("Confirm Changes")
+        confirm_btn.setIcon(QIcon(":/icons/right.png"))
+        add_btn = PushButton("Insert New Row")
+        add_btn.setIcon(QIcon(":/icons/plus.png"))
+        delete_btn = PushButton("Delete Selected")
+        delete_btn.setIcon(QIcon(":/icons/bin.png"))
+        discard_btn = PushButton("Discard Changes")
+        discard_btn.setIcon(QIcon(":/icons/undo.png"))
 
         add_btn.clicked.connect(self.insert_row)
         delete_btn.clicked.connect(self.delete_selected)

@@ -1,6 +1,6 @@
-from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QPalette
-from PySide6.QtWidgets import QApplication, QStyledItemDelegate
+from PySide6.QtWidgets import (QApplication, QLineEdit, QStyle,
+                               QStyledItemDelegate)
 
 
 class HighlightDelegate(QStyledItemDelegate):
@@ -12,7 +12,7 @@ class HighlightDelegate(QStyledItemDelegate):
         green = self.themed_color(QPalette.Base, QColor(168, 237, 168))
         red = self.themed_color(QPalette.Base, QColor(237, 152, 152))
         blue = self.themed_color(QPalette.Base, QColor(161, 164, 237))
-        dark_blue = self.themed_color(QPalette.Base, QColor(129, 132, 204))
+        dark_blue = self.themed_color(QPalette.Base, QColor(109, 107, 219))
 
         row_is_dirty = any(
             model.isDirty(model.index(index.row(), col))

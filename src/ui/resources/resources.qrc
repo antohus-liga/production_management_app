@@ -1,0 +1,9 @@
+<RCC>
+   <qresource prefix="/">
+      <file>../../../icons/back-arrow.png</file>
+      <file>../../../icons/bin.png</file>
+      <file>../../../icons/plus.png</file>
+      <file>../../../icons/right.png</file>
+      <file>../../../icons/undo.png</file>
+   </qresource>
+</RCC>
