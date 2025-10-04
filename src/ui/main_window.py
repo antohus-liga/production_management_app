@@ -8,7 +8,6 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Production Manager")
-        self.showFullScreen()
 
         self.stack = QStackedWidget()
 

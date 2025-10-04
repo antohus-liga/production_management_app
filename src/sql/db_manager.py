@@ -1,10 +1,6 @@
 from PySide6.QtSql import QSqlDatabase
-from sqlalchemy.orm import sessionmaker
 
-from sql.tables import db_path, engine
-
-Session = sessionmaker(bind=engine)
-session = Session()
+from sql.tables import db_path
 
 
 def create_connection() -> QSqlDatabase:

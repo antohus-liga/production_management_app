@@ -1,7 +1,8 @@
 from PySide6.QtWidgets import (QHBoxLayout, QHeaderView, QPushButton,
                                QSizePolicy, QTableView, QVBoxLayout, QWidget)
 
-from ui.tables.clients_model import TableModel
+from ui.tables.sql_table_model import TableModel
+from ui.tables.unsubmitted_highlight import HighlightDelegate
 
 
 class ClientsWidget(QWidget):
@@ -9,10 +10,13 @@ class ClientsWidget(QWidget):
         super().__init__()
         self.stack = stack
 
-        self.model = TableModel(self)
+        self.model = TableModel(self, "clients")
 
         self.table_view = QTableView()
         self.table_view.setModel(self.model)
+
+        self.delegate = HighlightDelegate(self.table_view)
+        self.table_view.setItemDelegate(self.delegate)
 
         self.table_view.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeToContents
@@ -33,19 +37,18 @@ class ClientsWidget(QWidget):
         confirm_btn = QPushButton("confirm changes")
         add_btn = QPushButton("insert")
         delete_btn = QPushButton("delete")
-        refresh_btn = QPushButton("refresh")
+        discard_btn = QPushButton("discard changes")
 
-        add_btn.clicked.connect(
-            lambda: self.model.insertRow(self.model.rowCount()))
-        confirm_btn.clicked.connect(lambda: self.model.submitAll())
+        add_btn.clicked.connect(self.insert_row)
         delete_btn.clicked.connect(self.delete_selected)
-        refresh_btn.clicked.connect(self.model.select)
+        discard_btn.clicked.connect(self.discard_changes)
+        confirm_btn.clicked.connect(self.model.submitAll)
 
         util_layout = QHBoxLayout()
         util_layout.addWidget(add_btn)
-        util_layout.addWidget(confirm_btn)
         util_layout.addWidget(delete_btn)
-        util_layout.addWidget(refresh_btn)
+        util_layout.addWidget(discard_btn)
+        util_layout.addWidget(confirm_btn)
 
         layout = QVBoxLayout()
         layout.addWidget(go_back_btn)
@@ -56,5 +59,31 @@ class ClientsWidget(QWidget):
 
     def delete_selected(self) -> None:
         selection = self.table_view.selectionModel().selectedRows()
-        for index in selection:
-            self.model.removeRow(index.row())
+        if not selection:
+            return
+
+        for index in sorted(selection, key=lambda x: x.row(), reverse=True):
+            row = index.row()
+            self.model.removeRow(row)
+
+            if row in self.delegate.new_rows:
+                self.delegate.new_rows.remove(row)
+
+            self.delegate.deleted_rows.add(row)
+            self.table_view.viewport().update()
+
+    def insert_row(self) -> None:
+        row = self.model.rowCount()
+        self.model.insertRow(row)
+
+        if row in self.delegate.deleted_rows:
+            self.delegate.deleted_rows.remove(row)
+
+        self.delegate.new_rows.add(row)
+        self.table_view.viewport().update()
+
+    def discard_changes(self) -> None:
+        self.model.revertAll()
+        self.delegate.new_rows.clear()
+        self.delegate.deleted_rows.clear()
+        self.table_view.viewport().update()
