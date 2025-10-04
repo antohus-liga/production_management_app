@@ -42,7 +42,7 @@ class ClientsWidget(QWidget):
         add_btn.clicked.connect(self.insert_row)
         delete_btn.clicked.connect(self.delete_selected)
         discard_btn.clicked.connect(self.discard_changes)
-        confirm_btn.clicked.connect(self.model.submitAll)
+        confirm_btn.clicked.connect(self.submit_changes)
 
         util_layout = QHBoxLayout()
         util_layout.addWidget(add_btn)
@@ -84,6 +84,12 @@ class ClientsWidget(QWidget):
 
     def discard_changes(self) -> None:
         self.model.revertAll()
+        self.delegate.new_rows.clear()
+        self.delegate.deleted_rows.clear()
+        self.table_view.viewport().update()
+
+    def submit_changes(self) -> None:
+        self.model.submitAll()
         self.delegate.new_rows.clear()
         self.delegate.deleted_rows.clear()
         self.table_view.viewport().update()
