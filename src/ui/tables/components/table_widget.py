@@ -41,12 +41,12 @@ class TableWidget(QWidget):
         util_layout.addWidget(discard_btn)
         util_layout.addWidget(confirm_btn)
 
-        layout = QVBoxLayout()
-        layout.addWidget(go_back_btn)
-        layout.addWidget(self.table_view)
-        layout.addLayout(util_layout)
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(go_back_btn)
+        self.layout.addWidget(self.table_view)
+        self.layout.addLayout(util_layout)
 
-        self.setLayout(layout)
+        self.setLayout(self.layout)
 
     def delete_selected(self) -> None:
         selection = self.table_view.selectionModel().selectedRows()
