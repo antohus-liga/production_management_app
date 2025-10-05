@@ -7,10 +7,10 @@ from ui.tables.components.subcomponents.unsubmitted_highlight import \
 
 
 class TableView(QTableView):
-    def __init__(self, table):
+    def __init__(self, table, db):
         super().__init__()
 
-        self.model = TableModel(self, table)
+        self.model = TableModel(self, table, db)
         self.setModel(self.model)
 
         self.font = QFont()

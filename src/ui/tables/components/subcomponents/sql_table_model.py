@@ -1,12 +1,9 @@
 from PySide6.QtCore import Qt
 from PySide6.QtSql import QSqlTableModel
 
-from sql.db_manager import create_connection
-
 
 class TableModel(QSqlTableModel):
-    def __init__(self, parent, table):
-        db = create_connection()
+    def __init__(self, parent, table, db):
         super().__init__(parent, db)
 
         self.setTable(table)

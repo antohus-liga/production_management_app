@@ -7,16 +7,19 @@ from ui.tables.components.subcomponents.table_view import TableView
 
 
 class TableWidget(QWidget):
-    def __init__(self, table):
+    def __init__(self, stack, table, db):
         super().__init__()
+        self.stack = stack
 
-        self.table_view = TableView(table)
+        self.table_view = TableView(table, db)
 
         size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         size.setHorizontalStretch(1)
         self.table_view.setSizePolicy(size)
         self.table_view.verticalHeader().setVisible(False)
 
+        go_back_btn = PushButton("Go back")
+        go_back_btn.setIcon(QIcon(":/icons/back-arrow.png"))
         confirm_btn = PushButton("Confirm Changes")
         confirm_btn.setIcon(QIcon(":/icons/right.png"))
         add_btn = PushButton("Insert New Row")
@@ -26,6 +29,7 @@ class TableWidget(QWidget):
         discard_btn = PushButton("Discard Changes")
         discard_btn.setIcon(QIcon(":/icons/undo.png"))
 
+        go_back_btn.clicked.connect(lambda: self.stack.setCurrentIndex(0))
         add_btn.clicked.connect(self.insert_row)
         delete_btn.clicked.connect(self.delete_selected)
         discard_btn.clicked.connect(self.discard_changes)
@@ -38,6 +42,7 @@ class TableWidget(QWidget):
         util_layout.addWidget(confirm_btn)
 
         layout = QVBoxLayout()
+        layout.addWidget(go_back_btn)
         layout.addWidget(self.table_view)
         layout.addLayout(util_layout)
 
