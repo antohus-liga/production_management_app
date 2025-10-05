@@ -5,5 +5,12 @@
       <file>../../../icons/plus.png</file>
       <file>../../../icons/right.png</file>
       <file>../../../icons/undo.png</file>
+      <file>../../../icons/supplier.png</file>
+      <file>../../../icons/sale.png</file>
+      <file>../../../icons/raw-material.png</file>
+      <file>../../../icons/production.png</file>
+      <file>../../../icons/product.png</file>
+      <file>../../../icons/customer-service.png</file>
+      <file>../../../icons/delivery.png</file>
    </qresource>
 </RCC>
