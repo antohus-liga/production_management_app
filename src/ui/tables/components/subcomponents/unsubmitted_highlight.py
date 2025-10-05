@@ -1,6 +1,5 @@
 from PySide6.QtGui import QColor, QPalette
-from PySide6.QtWidgets import (QApplication, QLineEdit, QStyle,
-                               QStyledItemDelegate)
+from PySide6.QtWidgets import QApplication, QStyledItemDelegate
 
 
 class HighlightDelegate(QStyledItemDelegate):

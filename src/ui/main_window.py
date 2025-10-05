@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QMainWindow, QStackedWidget
 
 from ui.main_menu import MainMenu
-from ui.tables.clients_widget import ClientsWidget
+from ui.tables.client_widget import ClientWidget
 
 
 class MainWindow(QMainWindow):
@@ -12,9 +12,9 @@ class MainWindow(QMainWindow):
         self.stack = QStackedWidget()
 
         self.main_menu = MainMenu(self.stack)
-        self.clients_table = ClientsWidget(self.stack)
+        self.client_table = ClientWidget(self.stack)
 
         self.stack.addWidget(self.main_menu)
-        self.stack.addWidget(self.clients_table)
+        self.stack.addWidget(self.client_table)
 
         self.setCentralWidget(self.stack)

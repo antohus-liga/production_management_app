@@ -10,4 +10,4 @@ class PushButton(QPushButton):
         self.font.setBold(True)
         self.font.setPointSize(16)
         self.setFont(self.font)
-        self.setIconSize(QSize(20, 20))
+        self.setIconSize(QSize(24, 24))
