@@ -17,6 +17,8 @@ class TableModel(QSqlTableModel):
             "clients": ["Code", "Name", "City", "Country", "Phone number", "Email"],
             "suppliers": ["Code", "Name", "City", "Country", "Phone number", "Email"],
             "materials": ["ID", "Description", "Quantity", "Price p/ Unit"],
+            "production": ["Number", "Product", "Quantity"],
+            "products": ["ID", "Material", "Description", "Quantity", "Selling Price"],
         }
 
         return map[table]

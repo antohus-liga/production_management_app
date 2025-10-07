@@ -1,5 +1,6 @@
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QHBoxLayout, QSizePolicy, QVBoxLayout, QWidget
+from PySide6.QtGui import QFont, QIcon
+from PySide6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout,
+                               QWidget)
 
 import ui.resources.resources_rc
 from ui.tables.components.subcomponents.push_button import PushButton
@@ -10,6 +11,8 @@ class TableWidget(QWidget):
     def __init__(self, stack, table, db):
         super().__init__()
         self.stack = stack
+        self.font = QFont()
+        self.font.setPointSize(24)
 
         self.table_view = TableView(table, db)
 
@@ -18,10 +21,13 @@ class TableWidget(QWidget):
         self.table_view.setSizePolicy(size)
         self.table_view.verticalHeader().setVisible(False)
 
+        table_label = QLabel(table.capitalize())
+        table_label.setFont(self.font)
+
         go_back_btn = PushButton("Go back")
         go_back_btn.setIcon(QIcon(":/icons/back-arrow.png"))
-        confirm_btn = PushButton("Confirm Changes")
-        confirm_btn.setIcon(QIcon(":/icons/right.png"))
+        self.confirm_btn = PushButton("Confirm Changes")
+        self.confirm_btn.setIcon(QIcon(":/icons/right.png"))
         add_btn = PushButton("Insert New Row")
         add_btn.setIcon(QIcon(":/icons/plus.png"))
         delete_btn = PushButton("Delete Selected")
@@ -33,15 +39,16 @@ class TableWidget(QWidget):
         add_btn.clicked.connect(self.insert_row)
         delete_btn.clicked.connect(self.delete_selected)
         discard_btn.clicked.connect(self.discard_changes)
-        confirm_btn.clicked.connect(self.submit_changes)
+        self.confirm_btn.clicked.connect(self.submit_changes)
 
         util_layout = QHBoxLayout()
         util_layout.addWidget(add_btn)
         util_layout.addWidget(delete_btn)
         util_layout.addWidget(discard_btn)
-        util_layout.addWidget(confirm_btn)
+        util_layout.addWidget(self.confirm_btn)
 
         self.layout = QVBoxLayout()
+        self.layout.addWidget(table_label)
         self.layout.addWidget(go_back_btn)
         self.layout.addWidget(self.table_view)
         self.layout.addLayout(util_layout)

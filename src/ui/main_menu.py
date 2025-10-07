@@ -11,26 +11,27 @@ class MainMenu(QWidget):
         self.stack = stack
         self.font = QFont()
         self.font.setPointSize(28)
-
-        clients_btn = QPushButton("Clients")
-        clients_btn.clicked.connect(lambda: self.stack.setCurrentIndex(1))
-        clients_btn.setIcon(QIcon(":/icons/customer-service.png"))
-        clients_btn.setIconSize(QSize(34, 34))
-        clients_btn.setFont(self.font)
-        suppliers_btn = QPushButton("Suppliers")
-        suppliers_btn.clicked.connect(lambda: self.stack.setCurrentIndex(2))
-        suppliers_btn.setIcon(QIcon(":/icons/supplier.png"))
-        suppliers_btn.setIconSize(QSize(34, 34))
-        suppliers_btn.setFont(self.font)
-        materials_btn = QPushButton("Materials")
-        materials_btn.clicked.connect(lambda: self.stack.setCurrentIndex(3))
-        materials_btn.setIcon(QIcon(":/icons/raw-material.png"))
-        materials_btn.setIconSize(QSize(34, 34))
-        materials_btn.setFont(self.font)
+        menu_btns: list[QPushButton] = [
+            QPushButton("Clients"),
+            QPushButton("Suppliers"),
+            QPushButton("Materials"),
+            QPushButton("Products"),
+            QPushButton("Production"),
+        ]
+        icons = (
+            ":/icons/customer-service.png",
+            ":/icons/supplier.png",
+            ":/icons/raw-material.png",
+            ":/icons/product.png",
+            ":/icons/production.png",
+        )
 
         layout = QVBoxLayout()
-        layout.addWidget(clients_btn)
-        layout.addWidget(suppliers_btn)
-        layout.addWidget(materials_btn)
+        for i, btn in enumerate(menu_btns):
+            btn.clicked.connect(lambda _, idx=i: self.stack.setCurrentIndex(idx + 1))
+            btn.setIcon(QIcon(icons[i]))
+            btn.setIconSize(QSize(34, 34))
+            btn.setFont(self.font)
+            layout.addWidget(btn)
 
         self.setLayout(layout)
