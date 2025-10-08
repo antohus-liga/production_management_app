@@ -8,6 +8,7 @@ class TableModel(QSqlTableModel):
 
         self.setTable(table)
         self.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        self.dataChanged.connect(lambda: self.submitAll())
         self.select()
         for i, data in enumerate(self.get_header_names(table)):
             self.setHeaderData(i, Qt.Horizontal, data)

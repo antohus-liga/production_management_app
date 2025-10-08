@@ -8,6 +8,7 @@ class ProductModel(QSqlTableModel):
 
         self.setTable("products")
         self.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        self.dataChanged.connect(lambda: self.submitAll())
         self.select()
 
         for i, data in enumerate(

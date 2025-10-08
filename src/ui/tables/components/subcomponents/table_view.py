@@ -3,8 +3,6 @@ from PySide6.QtWidgets import QHeaderView, QTableView
 
 from ui.tables.components.subcomponents.product_sql_model import ProductModel
 from ui.tables.components.subcomponents.sql_table_model import TableModel
-from ui.tables.components.subcomponents.unsubmitted_highlight import \
-    HighlightDelegate
 
 
 class TableView(QTableView):
@@ -25,9 +23,6 @@ class TableView(QTableView):
         self.setStyleSheet(
             "QLineEdit { background: palette(base); color: palette(text); }"
         )
-
-        self.delegate = HighlightDelegate(self)
-        self.setItemDelegate(self.delegate)
 
         self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)

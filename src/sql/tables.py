@@ -40,7 +40,8 @@ class ClientObj(Base):
 class MaterialObj(Base):
     __tablename__ = "materials"
 
-    id = Column(String(15), primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    code = Column(String(15), unique=True)
     description = Column(String(60))
     quantity = Column(Integer)
     unit_price = Column(Float(2))
@@ -95,7 +96,8 @@ class MovementOutObj(Base):
 class ProductObj(Base):
     __tablename__ = "products"
 
-    id = Column(String(15), primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    code = Column(String(15), unique=True)
     material_id = Column(String, ForeignKey("materials.id"))
     description = Column(String(80))
     quantity = Column(Integer)
@@ -114,7 +116,8 @@ class ProductObj(Base):
 class SupplierObj(Base):
     __tablename__ = "suppliers"
 
-    cod_sup = Column(String(15), primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    cod_sup = Column(String(15), unique=True)
     name = Column(String(60))
     city = Column(String(100))
     country = Column(String(40))

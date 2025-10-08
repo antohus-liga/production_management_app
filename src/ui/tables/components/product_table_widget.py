@@ -4,8 +4,6 @@ from PySide6.QtWidgets import (QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout,
 
 import ui.resources.resources_rc
 from ui.tables.components.subcomponents.push_button import PushButton
-from ui.tables.components.subcomponents.read_only_delegate import \
-    ReadOnlyDelegate
 from ui.tables.components.subcomponents.table_view import TableView
 
 
@@ -18,7 +16,6 @@ class ProductTableWidget(QWidget):
 
         self.table_view = TableView("products", db)
 
-        self.table_view.setItemDelegateForColumn(3, ReadOnlyDelegate())
         size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         size.setHorizontalStretch(1)
         self.table_view.setSizePolicy(size)
@@ -29,26 +26,20 @@ class ProductTableWidget(QWidget):
 
         go_back_btn = PushButton("Go back")
         go_back_btn.setIcon(QIcon(":/icons/back-arrow.png"))
-        self.confirm_btn = PushButton("Confirm Changes")
-        self.confirm_btn.setIcon(QIcon(":/icons/right.png"))
         add_btn = PushButton("Insert New Row")
         add_btn.setIcon(QIcon(":/icons/plus.png"))
         delete_btn = PushButton("Delete Selected")
         delete_btn.setIcon(QIcon(":/icons/bin.png"))
-        discard_btn = PushButton("Discard Changes")
-        discard_btn.setIcon(QIcon(":/icons/undo.png"))
 
         go_back_btn.clicked.connect(lambda: self.stack.setCurrentIndex(0))
-        add_btn.clicked.connect(self.insert_row)
+        add_btn.clicked.connect(
+            lambda: self.table_view.model.insertRow(self.table_view.model.rowCount())
+        )
         delete_btn.clicked.connect(self.delete_selected)
-        discard_btn.clicked.connect(self.discard_changes)
-        self.confirm_btn.clicked.connect(self.submit_changes)
 
         util_layout = QHBoxLayout()
         util_layout.addWidget(add_btn)
         util_layout.addWidget(delete_btn)
-        util_layout.addWidget(discard_btn)
-        util_layout.addWidget(self.confirm_btn)
 
         self.layout = QVBoxLayout()
         self.layout.addWidget(table_label)
@@ -67,30 +58,5 @@ class ProductTableWidget(QWidget):
             row = index.row()
             self.table_view.model.removeRow(row)
 
-            if row in self.table_view.delegate.new_rows:
-                self.table_view.delegate.new_rows.remove(row)
-
-            self.table_view.delegate.deleted_rows.add(row)
-            self.table_view.viewport().update()
-
-    def insert_row(self) -> None:
-        row = self.table_view.model.rowCount()
-        self.table_view.model.insertRow(row)
-
-        if row in self.table_view.delegate.deleted_rows:
-            self.table_view.delegate.deleted_rows.remove(row)
-
-        self.table_view.delegate.new_rows.add(row)
-        self.table_view.viewport().update()
-
-    def discard_changes(self) -> None:
-        self.table_view.model.revertAll()
-        self.table_view.delegate.new_rows.clear()
-        self.table_view.delegate.deleted_rows.clear()
-        self.table_view.viewport().update()
-
-    def submit_changes(self) -> None:
-        self.table_view.model.submitAll()
-        self.table_view.delegate.new_rows.clear()
-        self.table_view.delegate.deleted_rows.clear()
-        self.table_view.viewport().update()
+        if not self.table_view.model.submitAll():
+            print("Delete failed:", self.table_view.model.lastError().text())
