@@ -4,7 +4,6 @@ from PySide6.QtWidgets import QHeaderView, QTableView
 
 from ui.tables.components.subcomponents.length_limit_delegate import \
     LengthLimitedDelegate
-from ui.tables.components.subcomponents.product_sql_model import ProductModel
 from ui.tables.components.subcomponents.sql_table_model import TableModel
 
 
@@ -13,10 +12,7 @@ class TableView(QTableView):
         super().__init__()
         self.table = table
 
-        if self.table == "products":
-            self.model = ProductModel(self, db)
-        else:
-            self.model = TableModel(self, self.table, db)
+        self.model = TableModel(self, self.table, db)
         self.setModel(self.model)
         for i, data in enumerate(self.get_fields_info(self.table)):
             self.model.setHeaderData(i, Qt.Horizontal, data)
@@ -41,6 +37,7 @@ class TableView(QTableView):
 
     def get_fields_info(self, table) -> list[dict[str, int]]:
         # TABLE_NAME {FIELD_NAME: CHARACTER_LIMIT}
+        # LENGTH = 0: READ-ONLY
         map = {
             "clients": {
                 "Code": 15,

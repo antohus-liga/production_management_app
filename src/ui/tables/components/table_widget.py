@@ -25,7 +25,7 @@ class TableWidget(QWidget):
         self.table_view.verticalHeader().setVisible(False)
 
         table_label = QLabel(self.table.capitalize())
-        table_label.setFixedSize(100, 30)
+        table_label.setFixedHeight(30)
         table_label.setFont(self.font)
 
         go_back_btn = PushButton("Go back")

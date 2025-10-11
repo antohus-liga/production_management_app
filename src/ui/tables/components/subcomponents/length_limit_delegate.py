@@ -8,7 +8,6 @@ class LengthLimitedDelegate(QStyledItemDelegate):
         self.field_limits = field_limits
 
     def createEditor(self, parent, option, index):
-
         model = index.model()
         column_name = model.headerData(index.column(), Qt.Horizontal)
         max_len = self.field_limits.get(column_name)
