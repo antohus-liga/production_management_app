@@ -33,7 +33,8 @@ class ProductTableWidget(QWidget):
 
         go_back_btn.clicked.connect(lambda: self.stack.setCurrentIndex(0))
         add_btn.clicked.connect(
-            lambda: self.table_view.model.insertRow(self.table_view.model.rowCount())
+            lambda: self.table_view.model.insertRow(
+                self.table_view.model.rowCount())
         )
         delete_btn.clicked.connect(self.delete_selected)
 
