@@ -1,8 +1,6 @@
 import os
-
-from sqlalchemy import (Column, Float, ForeignKey, Integer, String,
-                        create_engine)
-from sqlalchemy.orm import declarative_base
+import sqlite3
+from typing import Optional
 
 data_path = os.path.join(
     os.path.dirname(__file__),
@@ -12,139 +10,173 @@ data_path = os.path.join(
 )
 db_path = os.path.join(data_path, "prod_info.db")
 
-engine = create_engine(f"sqlite:///{db_path}")
-Base = declarative_base()
+
+def get_connection(readonly: bool = False) -> sqlite3.Connection:
+    """Return a SQLite connection to the app database.
+
+    If readonly is True, open database in immutable mode when possible.
+    Ensures foreign_keys PRAGMA is enabled for every connection.
+    """
+    os.makedirs(data_path, exist_ok=True)
+    if readonly:
+        uri = f"file:{db_path}?mode=ro"
+        conn = sqlite3.connect(uri, uri=True, check_same_thread=False)
+    else:
+        conn = sqlite3.connect(db_path, check_same_thread=False)
+    conn.execute("PRAGMA foreign_keys = ON;")
+    conn.execute("PRAGMA journal_mode = WAL;")
+    conn.execute("PRAGMA synchronous = NORMAL;")
+    return conn
 
 
-class ClientObj(Base):
-    __tablename__ = "clients"
+def initialize_schema(conn: Optional[sqlite3.Connection] = None) -> None:
+    """Create database schema if it does not already exist."""
+    owns_connection = False
+    if conn is None:
+        conn = get_connection()
+        owns_connection = True
 
-    cod_cli = Column(String, primary_key=True)
-    name = Column(String)
-    city = Column(String)
-    country = Column(String)
-    phone = Column(String)
-    email = Column(String)
+    try:
+        cursor = conn.cursor()
 
-    def __repr__(self) -> str:
-        return (
-            f"(cod_cli={self.cod_cli}, "
-            f"name={self.name}, "
-            f"city={self.city}, "
-            f"country={self.country}, "
-            f"phone={self.phone}, "
-            f"email={self.email})"
+        # Entities
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS clients (
+                cod_cli TEXT PRIMARY KEY,
+                name TEXT,
+                city TEXT,
+                country TEXT,
+                phone TEXT,
+                email TEXT
+            );
+            """
         )
 
-
-class MaterialObj(Base):
-    __tablename__ = "materials"
-
-    id = Column(String, primary_key=True)
-    description = Column(String)
-    quantity = Column(Integer)
-    unit_price = Column(Float)
-
-    def __repr__(self) -> str:
-        return (
-            f"(id={self.id}, "
-            f"description={self.description}, "
-            f"quantity={self.quantity}, "
-            f"unit_price={self.unit_price})"
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS suppliers (
+                cod_sup TEXT PRIMARY KEY,
+                name TEXT,
+                city TEXT,
+                country TEXT,
+                phone TEXT,
+                email TEXT
+            );
+            """
         )
 
-
-class MovementInObj(Base):
-    __tablename__ = "movements_in"
-
-    movement_nr = Column(Integer, primary_key=True, autoincrement=True)
-    material_id = Column(String, ForeignKey("materials.id"))
-    quantity = Column(Integer)
-    total_price = Column(Float)
-    cod_sup = Column(String, ForeignKey("suppliers.cod_sup"))
-
-    def __repr__(self) -> str:
-        return (
-            f"(movement_nr={self.movement_nr}, "
-            f"material_id={self.material_id}, "
-            f"quantity={self.quantity}, "
-            f"total_price={self.total_price}, "
-            f"cod_sup={self.cod_sup})"
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS materials (
+                id TEXT PRIMARY KEY,
+                description TEXT,
+                quantity INTEGER NOT NULL DEFAULT 0,
+                unit_price REAL
+            );
+            """
         )
 
-
-class MovementOutObj(Base):
-    __tablename__ = "movements_out"
-
-    movement_nr = Column(Integer, primary_key=True, autoincrement=True)
-    product_id = Column(String, ForeignKey("products.id"))
-    quantity = Column(Integer)
-    total_price = Column(Float)
-    cod_cli = Column(String, ForeignKey("clients.cod_cli"))
-
-    def __repr__(self) -> str:
-        return (
-            f"(movement_nr={self.movement_nr}, "
-            f"product_id={self.product_id}, "
-            f"quantity={self.quantity}, "
-            f"total_price={self.total_price}, "
-            f"cod_cli={self.cod_cli})"
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS products (
+                id TEXT PRIMARY KEY,
+                description TEXT,
+                quantity INTEGER NOT NULL DEFAULT 0,
+                selling_price REAL
+            );
+            """
         )
 
-
-class ProductObj(Base):
-    __tablename__ = "products"
-
-    id = Column(String, primary_key=True)
-    material_id = Column(String, ForeignKey("materials.id"))
-    description = Column(String)
-    quantity = Column(Integer)
-    selling_price = Column(Float)
-
-    def __repr__(self) -> str:
-        return (
-            f"(id={self.id}, "
-            f"material_id={self.material_id}, "
-            f"description={self.description}, "
-            f"quantity={self.quantity}, "
-            f"selling_price={self.selling_price})"
+        # Bill of Materials (BOM): N-N between products and materials
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS product_materials (
+                product_id TEXT,
+                material_id TEXT,
+                quantity_per_unit REAL,
+                PRIMARY KEY (product_id, material_id),
+                FOREIGN KEY (product_id) REFERENCES products(id)
+                    ON UPDATE CASCADE ON DELETE CASCADE,
+                FOREIGN KEY (material_id) REFERENCES materials(id)
+                    ON UPDATE CASCADE ON DELETE RESTRICT
+            );
+            """
         )
 
-
-class SupplierObj(Base):
-    __tablename__ = "suppliers"
-
-    cod_sup = Column(String, primary_key=True)
-    name = Column(String)
-    city = Column(String)
-    country = Column(String)
-    phone = Column(String)
-    email = Column(String)
-
-    def __repr__(self) -> str:
-        return (
-            f"(cod_sup={self.cod_sup}, "
-            f"name={self.name}, "
-            f"city={self.city}, "
-            f"country={self.country}, "
-            f"phone={self.phone}, "
-            f"email={self.email})"
+        # Movements
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS movements_in (
+                movement_nr INTEGER PRIMARY KEY AUTOINCREMENT,
+                material_id TEXT,
+                quantity INTEGER,
+                total_price REAL,
+                cod_sup TEXT,
+                created_at TEXT DEFAULT (datetime('now', 'localtime')),
+                FOREIGN KEY (material_id) REFERENCES materials(id)
+                    ON UPDATE CASCADE ON DELETE RESTRICT,
+                FOREIGN KEY (cod_sup) REFERENCES suppliers(cod_sup)
+                    ON UPDATE CASCADE ON DELETE SET NULL
+            );
+            """
         )
 
-
-class ProductionObj(Base):
-    __tablename__ = "production"
-
-    production_nr = Column(Integer, primary_key=True, autoincrement=True)
-    product_id = Column(String, ForeignKey("products.id"))
-    quantity_produced = Column(Integer)
-
-    def __repr__(self) -> str:
-        return (
-            f"(production_nr={self.production_nr}, "
-            f"product_id={self.product_id})"
-            f"quantity_produced={self.quantity_produced})"
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS movements_out (
+                movement_nr INTEGER PRIMARY KEY AUTOINCREMENT,
+                product_id TEXT,
+                quantity INTEGER,
+                total_price REAL,
+                cod_cli TEXT,
+                created_at TEXT DEFAULT (datetime('now', 'localtime')),
+                FOREIGN KEY (product_id) REFERENCES products(id)
+                    ON UPDATE CASCADE ON DELETE RESTRICT,
+                FOREIGN KEY (cod_cli) REFERENCES clients(cod_cli)
+                    ON UPDATE CASCADE ON DELETE SET NULL
+            );
+            """
         )
 
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS production (
+                production_nr INTEGER PRIMARY KEY AUTOINCREMENT,
+                product_id TEXT,
+                quantity_produced INTEGER,
+                created_at TEXT DEFAULT (datetime('now')),
+                FOREIGN KEY (product_id) REFERENCES products(id)
+                    ON UPDATE CASCADE ON DELETE RESTRICT
+            );
+            """
+        )
 
-Base.metadata.create_all(bind=engine)
+        # Indexes for common lookups
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_materials_description ON materials(description);"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_products_description ON products(description);"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_mov_in_material ON movements_in(material_id);"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_mov_out_product ON movements_out(product_id);"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_pm_product ON product_materials(product_id);"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_pm_material ON product_materials(material_id);"
+        )
+
+        conn.commit()
+    finally:
+        if owns_connection and conn is not None:
+            conn.close()
+
+
+# Initialize schema on module import to ensure tables exist for the app
+initialize_schema()

@@ -28,24 +28,24 @@ class TableWidget(QWidget):
         table_label.setFixedHeight(30)
         table_label.setFont(self.font)
 
-        go_back_btn = PushButton("Go back")
-        go_back_btn.setIcon(QIcon(":/icons/back-arrow.png"))
         add_btn = PushButton("Insert New Row")
         add_btn.setIcon(QIcon(":/icons/plus.png"))
         delete_btn = PushButton("Delete Selected")
         delete_btn.setIcon(QIcon(":/icons/bin.png"))
+        delete_all_btn = PushButton("Delete All")
+        delete_all_btn.setIcon(QIcon(":/icons/bin.png"))
 
-        go_back_btn.clicked.connect(lambda: self.stack.setCurrentIndex(0))
         add_btn.clicked.connect(self.insert_row)
         delete_btn.clicked.connect(self.delete_selected)
+        delete_all_btn.clicked.connect(self.delete_all)
 
         util_layout = QHBoxLayout()
+        util_layout.addWidget(delete_all_btn)
         util_layout.addWidget(add_btn)
         util_layout.addWidget(delete_btn)
 
         self.layout = QVBoxLayout()
         self.layout.addWidget(table_label)
-        self.layout.addWidget(go_back_btn)
         self.layout.addWidget(self.table_view)
         self.layout.addLayout(util_layout)
 
@@ -70,7 +70,57 @@ class TableWidget(QWidget):
         row = self.table_view.model.rowCount()
         self.table_view.model.insertRow(row)
 
-        if self.table != "production":
-            new_code = f"{self.table[:3:].upper()}{uuid.uuid4().hex[:8]}"
-            self.table_view.model.setData(
-                self.table_view.model.index(row, 0), new_code)
+        if self.table in ("production", "movements_in", "movements_out"):
+            # Auto-increment: get the maximum integer key and increment
+            new_code = self._get_next_auto_increment()
+            self.table_view.model.setData(self.table_view.model.index(row, 0), new_code)
+        else:
+            # UUID-based key generation
+            new_code = f"{self.table[:3].upper()}{uuid.uuid4().hex[:8]}"
+            self.table_view.model.setData(self.table_view.model.index(row, 0), new_code)
+
+        # Try to persist the inserted row; if required fields are missing, keep the row pending
+        if not self.table_view.model.submitAll():
+            print("Insert submit failed:", self.table_view.model.lastError().text())
+        else:
+            self.table_view.model.select()
+
+    def _get_next_auto_increment(self):
+        """
+        Get the next auto-increment value by finding the maximum integer key
+        in the first column and incrementing it by 1.
+        """
+        try:
+            model = self.table_view.model
+            max_value = 0
+
+            # Iterate through all rows to find the maximum integer value
+            for row in range(model.rowCount()):
+                cell_value = model.data(model.index(row, 0))
+
+                # Handle None or empty values
+                if cell_value is None or cell_value == "":
+                    continue
+
+                try:
+                    # Try to convert to integer
+                    int_value = int(cell_value)
+                    max_value = max(max_value, int_value)
+                except (ValueError, TypeError):
+                    # Skip non-integer values
+                    continue
+
+            return max_value + 1
+
+        except Exception as e:
+            print(f"Error getting next auto-increment value: {e}")
+            # Fallback: return 1 if something goes wrong
+            return 1
+
+    def delete_all(self) -> None:
+        # Efficiently delete all rows from the current table
+        db = self.table_view.model.database()
+        query = db.exec(f"DELETE FROM {self.table}")
+        if query.lastError().isValid():
+            print("Delete all failed:", query.lastError().text())
+        self.table_view.model.select()
