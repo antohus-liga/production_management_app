@@ -25,14 +25,12 @@ class MainMenu(QWidget):
         icon_label.setPixmap(QIcon(":/icons/production.png").pixmap(96, 96))
         icon_label.setAlignment(Qt.AlignCenter)
 
-        title = QLabel("Welcome to Production Manager")
+        title = QLabel("Bem-vindo ao Gestor de Produção")
         title.setFont(title_font)
         title.setAlignment(Qt.AlignCenter)
 
         subtitle = QLabel(
-            "Use the tabs at the top to navigate between Clients, Suppliers,\n"
-            "Materials, Products, and Production."
-        )
+            "Utilize as janelas em cima para a navegação entre tabelas")
         subtitle.setFont(subtitle_font)
         subtitle.setAlignment(Qt.AlignCenter)
 

@@ -1,10 +1,11 @@
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QSplitter
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QFont, QIcon
+from PySide6.QtWidgets import (QHBoxLayout, QLabel, QSplitter, QVBoxLayout,
+                               QWidget)
 
+from ui.tables.components.subcomponents.push_button import PushButton
 from ui.tables.components.subcomponents.table_view import TableView
 from ui.tables.components.table_widget import TableWidget
-from ui.tables.components.subcomponents.push_button import PushButton
-from PySide6.QtGui import QIcon, QFont
 
 
 class ProductWidget(QWidget):
@@ -13,7 +14,7 @@ class ProductWidget(QWidget):
         self.stack = stack
 
         # Master view: products
-        self.master = TableWidget(self.stack, "products", db)
+        self.master = TableWidget(self.stack, "products", db, "Produtos")
 
         # Detail view: product_materials filtered by selected product
         self.detail_view = TableView("product_materials", db)
@@ -26,15 +27,15 @@ class ProductWidget(QWidget):
         self.detail_label_font = QFont()
         self.detail_label_font.setPointSize(20)
 
-        detail_label = QLabel("Bill of Materials")
+        detail_label = QLabel("Lista de Materiais")
         detail_label.setFont(self.detail_label_font)
         detail_label.setFixedHeight(26)
 
-        self.detail_add_btn = PushButton("Insert New Row")
+        self.detail_add_btn = PushButton("Inserir novo registo")
         self.detail_add_btn.setIcon(QIcon(":/icons/plus.png"))
-        self.detail_delete_btn = PushButton("Delete Selected")
+        self.detail_delete_btn = PushButton("Eliminar selecionados")
         self.detail_delete_btn.setIcon(QIcon(":/icons/bin.png"))
-        self.detail_delete_all_btn = PushButton("Delete All (for product)")
+        self.detail_delete_all_btn = PushButton("Eliminar todos")
         self.detail_delete_all_btn.setIcon(QIcon(":/icons/bin.png"))
 
         self.detail_add_btn.clicked.connect(self.detail_insert_row)
@@ -73,14 +74,16 @@ class ProductWidget(QWidget):
         materials_model = self._get_materials_model(db)
         if materials_model is not None:
             materials_model.dataChanged.connect(self._refresh_detail_delegates)
-            materials_model.rowsInserted.connect(self._refresh_detail_delegates)
+            materials_model.rowsInserted.connect(
+                self._refresh_detail_delegates)
             materials_model.rowsRemoved.connect(self._refresh_detail_delegates)
 
         # Ensure initial selection drives the detail
         self._sync_detail_filter()
 
         # On inserting into detail, auto-set hidden product_id to current master id
-        self.detail_view.model.rowsInserted.connect(self._assign_product_id_to_detail)
+        self.detail_view.model.rowsInserted.connect(
+            self._assign_product_id_to_detail)
 
         # Initialize enabled state
         self._update_detail_buttons_enabled()
@@ -111,9 +114,14 @@ class ProductWidget(QWidget):
         if product_id is None:
             return
         for row in range(first, last + 1):
-            self.detail_view.model.setData(self.detail_view.model.index(row, 0), product_id)
+            self.detail_view.model.setData(
+                self.detail_view.model.index(row, 0), product_id
+            )
         if not self.detail_view.model.submitAll():
-            print("Detail assign product_id failed:", self.detail_view.model.lastError().text())
+            print(
+                "Detail assign product_id failed:",
+                self.detail_view.model.lastError().text(),
+            )
         else:
             self.detail_view.model.select()
 
@@ -121,6 +129,7 @@ class ProductWidget(QWidget):
         # Create a lightweight model to watch materials table changes
         try:
             from PySide6.QtSql import QSqlTableModel
+
             model = QSqlTableModel(self, db)
             model.setTable("materials")
             model.select()
@@ -138,7 +147,8 @@ class ProductWidget(QWidget):
         self.detail_view.model.setFilter(current_filter)
         self.detail_view.model.select()
         # Reconnect handlers
-        self.detail_view.model.rowsInserted.connect(self._assign_product_id_to_detail)
+        self.detail_view.model.rowsInserted.connect(
+            self._assign_product_id_to_detail)
 
     def _update_detail_buttons_enabled(self) -> None:
         has_product = self._current_product_id() is not None
@@ -156,7 +166,8 @@ class ProductWidget(QWidget):
         self.detail_view.model.setData(
             self.detail_view.model.index(row, 0), product_id)
         if not self.detail_view.model.submitAll():
-            print("Detail insert failed:", self.detail_view.model.lastError().text())
+            print("Detail insert failed:",
+                  self.detail_view.model.lastError().text())
         else:
             self.detail_view.model.select()
 
@@ -167,7 +178,8 @@ class ProductWidget(QWidget):
         for index in sorted(selection, key=lambda x: x.row(), reverse=True):
             self.detail_view.model.removeRow(index.row())
         if not self.detail_view.model.submitAll():
-            print("Detail delete failed:", self.detail_view.model.lastError().text())
+            print("Detail delete failed:",
+                  self.detail_view.model.lastError().text())
             self.detail_view.model.revertAll()
         else:
             self.detail_view.model.select()
@@ -177,7 +189,9 @@ class ProductWidget(QWidget):
         if product_id is None:
             return
         db = self.detail_view.model.database()
-        query = db.exec(f"DELETE FROM product_materials WHERE product_id = '{product_id}'")
+        query = db.exec(
+            f"DELETE FROM product_materials WHERE product_id = '{product_id}'"
+        )
         if query.lastError().isValid():
             print("Detail delete all failed:", query.lastError().text())
         self.detail_view.model.select()

@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         db = create_connection()
-        self.setWindowTitle("Production Manager")
+        self.setWindowTitle("Gestor de Produção")
 
         tabs = QTabWidget()
         self._welcome_shown = True
@@ -33,32 +33,42 @@ class MainWindow(QMainWindow):
         self.production_widget = ProductionWidget(tabs, db)
 
         # Add tabs with icons
-        tabs.addTab(welcome_widget, QIcon(":/icons/production.png"), "Welcome")
+        tabs.addTab(welcome_widget, QIcon(
+            ":/icons/production.png"), "Bem-vindo")
         tabs.addTab(
-            self.client_widget, QIcon(":/icons/customer-service.png"), "Clients"
+            self.client_widget, QIcon(
+                ":/icons/customer-service.png"), "Clientes"
         )
-        tabs.addTab(self.supplier_widget, QIcon(":/icons/supplier.png"), "Suppliers")
+        tabs.addTab(self.supplier_widget, QIcon(
+            ":/icons/supplier.png"), "Fornecedores")
         tabs.addTab(
-            self.material_widget, QIcon(":/icons/raw-material.png"), "Materials"
+            self.material_widget, QIcon(
+                ":/icons/raw-material.png"), "Materiais"
         )
         tabs.addTab(
-            self.movements_in_widget, QIcon(":/icons/delivery.png"), "Movements In"
+            self.movements_in_widget,
+            QIcon(":/icons/delivery.png"),
+            "Movementos de Entrada",
         )
         tabs.addTab(
-            self.movements_out_widget, QIcon(":/icons/sale.png"), "Movements Out"
+            self.movements_out_widget, QIcon(
+                ":/icons/sale.png"), "Movementos de Saída"
         )
-        tabs.addTab(self.product_widget, QIcon(":/icons/product.png"), "Products")
-        tabs.addTab(
-            self.production_widget, QIcon(":/icons/production.png"), "Production"
-        )
+        tabs.addTab(self.product_widget, QIcon(
+            ":/icons/product.png"), "Produtos")
+        tabs.addTab(self.production_widget, QIcon(
+            ":/icons/production.png"), "Produção")
 
         # Optional: unify icon sizes similar to the old menu
         tabs.setIconSize(QSize(24, 24))
 
         # When production changes, refresh product table model
-        self.production_widget.quantity_updated.connect(self._update_quantities)
-        self.movements_out_widget.values_updated.connect(self._update_quantities)
-        self.movements_in_widget.values_updated.connect(self._update_quantities)
+        self.production_widget.quantity_updated.connect(
+            self._update_quantities)
+        self.movements_out_widget.values_updated.connect(
+            self._update_quantities)
+        self.movements_in_widget.values_updated.connect(
+            self._update_quantities)
 
         # Remove welcome tab after first switch to any table tab
         def handle_tab_change(index: int):

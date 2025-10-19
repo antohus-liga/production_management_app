@@ -20,7 +20,8 @@ class TableView(QTableView):
         for i, data in enumerate(self.get_fields_info(self.table)):
             self.model.setHeaderData(i, Qt.Horizontal, data)
 
-        self.delegate = LengthLimitedDelegate(self.get_fields_info(self.table), self)
+        self.delegate = LengthLimitedDelegate(
+            self.get_fields_info(self.table), self)
         self.setItemDelegate(self.delegate)
 
         # If this is the product_materials detail table, set a combobox delegate for material_id (column 1)
@@ -33,7 +34,8 @@ class TableView(QTableView):
         self.font.setPointSize(14)
 
         self.setFont(self.font)
-        self.setEditTriggers(QTableView.DoubleClicked | QTableView.SelectedClicked)
+        self.setEditTriggers(QTableView.DoubleClicked |
+                             QTableView.SelectedClicked)
         self.setStyleSheet(
             "QLineEdit { background: palette(base); color: palette(text); }"
         )
@@ -47,7 +49,8 @@ class TableView(QTableView):
             # Column 1 is material_id in product_materials
             self.horizontalHeader().setSectionResizeMode(1, QHeaderView.Fixed)
             fm = QFontMetrics(self.font)
-            width_px = fm.horizontalAdvance("M" * 15) + 24  # padding for cell margins
+            width_px = fm.horizontalAdvance(
+                "M" * 15) + 24  # padding for cell margins
             self.setColumnWidth(1, width_px)
 
     def get_fields_info(self, table) -> list[dict[str, int]]:
@@ -55,59 +58,59 @@ class TableView(QTableView):
         # LENGTH = 0: READ-ONLY
         map = {
             "clients": {
-                "Code": 15,
-                "Name": 60,
-                "City": 40,
-                "Country": 30,
-                "Phone number": 9,
+                "Código": 15,
+                "Nome": 60,
+                "Cidade": 40,
+                "País": 30,
+                "Telemóvel": 9,
                 "Email": 40,
             },
             "suppliers": {
-                "Code": 15,
-                "Name": 60,
-                "City": 40,
-                "Country": 30,
-                "Phone number": 9,
+                "Código": 15,
+                "Nome": 60,
+                "Cidade": 40,
+                "País": 30,
+                "Telemóvel": 9,
                 "Email": 40,
             },
             "materials": {
                 "ID": 15,
-                "Description": 80,
-                "Quantity": 0,
-                "Price p/ Unit": 12,
+                "Descrição": 80,
+                "Quantidade": 0,
+                "Preço p/ unidade": 12,
             },
             "production": {
-                "Number": 0,
-                "Product": 15,
-                "Quantity": 8,
-                "Created at": 0,
+                "Número": 0,
+                "Produto": 15,
+                "Quantidade": 8,
+                "Criado em": 0,
             },
             "products": {
                 "ID": 15,
-                "Description": 80,
-                "Quantity": 0,
-                "Selling Price": 12,
+                "Descrição": 80,
+                "Quantidade": 0,
+                "Preço de venda": 12,
             },
             "product_materials": {
-                "Product": 0,  # hidden in detail view
+                "Produto": 0,  # hidden in detail view
                 "Material": 15,
-                "Qty per unit": 12,
+                "Qtd por unidade": 12,
             },
             "movements_in": {
-                "Number": 0,
+                "Número": 0,
                 "Material": 15,
-                "Quantity": 8,
-                "Total Price": 0,
-                "Supplier": 15,
-                "Created": 0,
+                "Quantidade": 8,
+                "Preço total": 0,
+                "Fornecedor": 15,
+                "Criado em": 0,
             },
             "movements_out": {
-                "Number": 0,
-                "Product": 15,
-                "Quantity": 8,
-                "Total Price": 0,
-                "Client": 15,
-                "Created": 0,
+                "Número": 0,
+                "Produto": 15,
+                "Quantidade": 8,
+                "Preço total": 0,
+                "Cliente": 15,
+                "Criado em": 0,
             },
         }
         return map[table]

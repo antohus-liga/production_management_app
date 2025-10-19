@@ -11,7 +11,9 @@ class MovementsOutWidget(QWidget):
     def __init__(self, stack, db):
         super().__init__()
         self.stack = stack
-        self.table_widget = TableWidget(self.stack, "movements_out", db)
+        self.table_widget = TableWidget(
+            self.stack, "movements_out", db, "Movimentos de Saída"
+        )
         self.table_widget.table_view.model.dataChanged.connect(
             self.trigger_calculus_update
         )

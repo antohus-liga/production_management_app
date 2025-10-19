@@ -10,7 +10,7 @@ from ui.tables.components.subcomponents.table_view import TableView
 
 
 class TableWidget(QWidget):
-    def __init__(self, stack, table, db):
+    def __init__(self, stack, table, db, label=None):
         super().__init__()
         self.table = table
         self.stack = stack
@@ -24,15 +24,15 @@ class TableWidget(QWidget):
         self.table_view.setSizePolicy(size)
         self.table_view.verticalHeader().setVisible(False)
 
-        table_label = QLabel(self.table.capitalize())
+        table_label = QLabel(label)
         table_label.setFixedHeight(30)
         table_label.setFont(self.font)
 
-        add_btn = PushButton("Insert New Row")
+        add_btn = PushButton("Inserir novo registo")
         add_btn.setIcon(QIcon(":/icons/plus.png"))
-        delete_btn = PushButton("Delete Selected")
+        delete_btn = PushButton("Eliminar selecionados")
         delete_btn.setIcon(QIcon(":/icons/bin.png"))
-        delete_all_btn = PushButton("Delete All")
+        delete_all_btn = PushButton("Eliminar todos")
         delete_all_btn.setIcon(QIcon(":/icons/bin.png"))
 
         add_btn.clicked.connect(self.insert_row)
@@ -73,15 +73,18 @@ class TableWidget(QWidget):
         if self.table in ("production", "movements_in", "movements_out"):
             # Auto-increment: get the maximum integer key and increment
             new_code = self._get_next_auto_increment()
-            self.table_view.model.setData(self.table_view.model.index(row, 0), new_code)
+            self.table_view.model.setData(
+                self.table_view.model.index(row, 0), new_code)
         else:
             # UUID-based key generation
             new_code = f"{self.table[:3].upper()}{uuid.uuid4().hex[:8]}"
-            self.table_view.model.setData(self.table_view.model.index(row, 0), new_code)
+            self.table_view.model.setData(
+                self.table_view.model.index(row, 0), new_code)
 
         # Try to persist the inserted row; if required fields are missing, keep the row pending
         if not self.table_view.model.submitAll():
-            print("Insert submit failed:", self.table_view.model.lastError().text())
+            print("Insert submit failed:",
+                  self.table_view.model.lastError().text())
         else:
             self.table_view.model.select()
 

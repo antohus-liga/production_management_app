@@ -12,7 +12,8 @@ class ProductionWidget(QWidget):
         super().__init__()
         self.stack = stack
 
-        self.table_widget = TableWidget(self.stack, "production", db)
+        self.table_widget = TableWidget(
+            self.stack, "production", db, "Produção")
         self.table_widget.table_view.model.dataChanged.connect(
             self.trigger_product_update
         )

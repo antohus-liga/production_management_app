@@ -7,6 +7,7 @@ class SupplierWidget(QWidget):
     def __init__(self, stack, db):
         super().__init__()
         self.stack = stack
-        self.table_widget = TableWidget(self.stack, "suppliers", db)
+        self.table_widget = TableWidget(
+            self.stack, "suppliers", db, "Fornecedores")
 
         self.setLayout(self.table_widget.layout)
